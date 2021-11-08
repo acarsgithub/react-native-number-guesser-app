@@ -1,43 +1,90 @@
-import React from 'react';
-import { Text, StyleSheet, Button, View, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Text, StyleSheet, Button, View, Image, Dimensions, ScrollView } from 'react-native';
 import BodyText from '../components/BodyText';
 import colors from '../constants/colors';
 import MainButton from '../components/MainButton';
 
 const GameOverScreen = props => {
-  return (
-    <View style={styles.screen} >
-      <Text style={styles.title}>Game Over!</Text>
-      <View style={styles.imageContainer}>
-        <Image 
-          fadeDuration={1000}
-          source={require('../assets/success.png')} 
-          style={styles.image} 
-          resizeMode="cover" 
-        /> 
-      </View>
-      <View style={styles.resultContainer}>
-        <BodyText style={styles.resultText}>
-          Your phone needed <Text style={styles.highlight}>{props.numRounds}</Text> rounds to guess the number <Text style={styles.highlight}>{props.userNumber}</Text>.
-        </BodyText>
-      </View>
-      <MainButton onPress={props.configureNewGame}>NEW GAME</MainButton>
-    </View>
-  )
+
+  const [availableDeviceHeight, setAvailableDeviceHeight] = useState(Dimensions.get('window').height);
+  const [availableDeviceWidth, setAvailableDeviceWidth] = useState(Dimensions.get('window').width);
+
+  useEffect(() => {
+    const updateLayout = () => {
+      setAvailableDeviceWidth(Dimensions.get('window').width);
+      setAvailableDeviceHeight(Dimensions.get('window').height);
+    };
+
+    Dimensions.addEventListener('change', updateLayout);
+
+    return () => {
+      Dimensions.removeEventListener('change', updateLayout);
+    };
+  });
+
+  if (availableDeviceHeight < 500) {
+
+    return (
+      <ScrollView>
+        <View style={{...styles.screen, marginTop: '8%'}} >
+          <View style={{...styles.resultContainer, marginVertical: availableDeviceHeight / 30 }}>
+            <BodyText style={{...styles.resultText, fontSize: availableDeviceHeight < 400 ? 17 : 19}}>
+              Your phone needed <Text style={styles.highlight}>{props.numRounds}</Text> rounds to guess the number <Text style={styles.highlight}>{props.userNumber}</Text>.
+            </BodyText>
+          </View>
+          <MainButton onPress={{...props.configureNewGame}}>NEW GAME</MainButton>
+        </View>
+      </ScrollView>
+    );
+
+  } else {
+
+    return (
+      <ScrollView>
+        <View style={styles.screen} >
+          <Text style={styles.title}>Game Over!</Text>
+          <View style={{
+              ...styles.imageContainer, 
+              borderRadius: availableDeviceWidth * 0.7 / 2,
+              height: availableDeviceWidth * 0.7,
+              width: availableDeviceWidth * 0.7,
+              marginVertical: availableDeviceHeight / 18
+            }}>
+            <Image 
+              fadeDuration={1000}
+              source={require('../assets/success.png')} 
+              style={styles.image} 
+              resizeMode="cover" 
+            /> 
+          </View>
+          <View style={{...styles.resultContainer, marginVertical: availableDeviceHeight / 40 }}>
+            <BodyText style={{...styles.resultText, fontSize: availableDeviceHeight < 400 ? 17 : 19}}>
+              Your phone needed <Text style={styles.highlight}>{props.numRounds}</Text> rounds to guess the number <Text style={styles.highlight}>{props.userNumber}</Text>.
+            </BodyText>
+          </View>
+          <MainButton onPress={props.configureNewGame}>NEW GAME</MainButton>
+        </View>
+      </ScrollView>
+    );
+
+  };
 };
 
 export default GameOverScreen;
+
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    paddingVertical: 20
   },
 
   title: {
     fontSize: 22.5,
-    fontFamily: 'open-sans-bold'
+    fontFamily: 'open-sans-bold',
+    marginTop: 10
   },
 
   image: {
@@ -46,13 +93,9 @@ const styles = StyleSheet.create({
   },
 
   imageContainer: {
-    borderRadius: 150,
     borderColor: 'black',
     borderWidth: 3, 
-    width: 300,
-    height: 300,
-    overflow: 'hidden',
-    marginVertical: 20
+    overflow: 'hidden'
   },
 
   highlight: {
@@ -62,12 +105,10 @@ const styles = StyleSheet.create({
   },
 
   resultContainer: {
-    marginHorizontal: 30,
-    marginVertical: 15
+    marginHorizontal: 30
   },
 
   resultText: {
-    textAlign: 'center',
-    fontSize: 19
+    textAlign: 'center'
   }
 });

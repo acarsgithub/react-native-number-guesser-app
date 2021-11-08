@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Button, Alert, ScrollView, Dimensions } from 'react-native';
 import NumberContainer from '../components/NumberContainer';
 import Card from '../components/Card';
 import { Ionicons } from '@expo/vector-icons';
@@ -36,12 +36,30 @@ const GameScreen = props => {
   const [pastGuesses, setPastGuesses] = useState([initialGuess]);
   const [currentGuess, setCurrentGuess] = useState(initialGuess);
   const {userChoice, onGameOver} = props;
+  const [availableDeviceWidth, setAvailableDeviceWidth] = useState(Dimensions.get('window').width);
+  const [availableDeviceHeight, setAvailableDeviceHeight] = useState(Dimensions.get('window').height);
+
 
   useEffect(() => { 
     if (currentGuess === userChoice){
       onGameOver(pastGuesses.length);
     };
   }, [currentGuess, userChoice, onGameOver]);
+
+
+  useEffect(() => {
+
+    const updateLayout = () => {
+      setAvailableDeviceHeight(Dimensions.get('window').height);
+      setAvailableDeviceWidth(Dimensions.get('window').width);
+    };
+
+    Dimensions.addEventListener('change', updateLayout);
+
+    return () => {
+      Dimensions.removeEventListener('change', updateLayout);
+    };
+  });
 
 
   const nextGuessHandler = (direction) => {
@@ -59,26 +77,46 @@ const GameScreen = props => {
 
     const nextNumber = generateRandomBetween(minValue.current, maxValue.current, currentGuess);
     setCurrentGuess(nextNumber);
-    // setRounds(curRounds => curRounds + 1);
     setPastGuesses(curPastGuesses => [nextNumber, ...curPastGuesses]);
   };
 
-  return (
-    <View style={styles.screen}>
-      <Text style={styles.text}>Computer's Guess</Text>
-      <NumberContainer>{currentGuess}</NumberContainer>
-      <Card style={styles.buttonContainer} >
-        <Button title="LOWER" color="red" onPress={nextGuessHandler.bind(this, 'lower')} ></Button>
-        <Button title="GREATER" onPress={nextGuessHandler.bind(this, 'greater')} ></Button>
-      </Card>
-      <View style={styles.listContainer}>
-        <Text style={styles.scrollTitle}>Guess History</Text>
-        <ScrollView contentContainerStyle={styles.list}>
-          {pastGuesses.map((guess, index) => renderListItem(guess, pastGuesses.length - (index)))}
-        </ScrollView>
-      </View>
+  if (availableDeviceHeight < 500){
+
+    return (
+      <View style={styles.screen}>
+        <View style={styles.contentContainer}>
+          <Button title="LOWER" color="red" onPress={nextGuessHandler.bind(this, 'lower')} ></Button>
+          <NumberContainer>{currentGuess}</NumberContainer>
+          <Button title="GREATER" onPress={nextGuessHandler.bind(this, 'greater')} ></Button>
+        </View>
+        <View style={styles.listContainer}>
+          <ScrollView contentContainerStyle={styles.list}>
+            {pastGuesses.map((guess, index) => renderListItem(guess, pastGuesses.length - (index)))}
+          </ScrollView>
+        </View>
     </View>
-  )
+    );
+
+  } else {
+
+    return (
+      <View style={styles.screen}>
+        <Text style={styles.text}>Computer's Guess</Text>
+        <NumberContainer>{currentGuess}</NumberContainer>
+        <Card style={{...styles.buttonContainer, margin: availableDeviceHeight > 600 ? 20 : 10}} >
+          <Button title="LOWER" color="red" onPress={nextGuessHandler.bind(this, 'lower')} ></Button>
+          <Button title="GREATER" onPress={nextGuessHandler.bind(this, 'greater')} ></Button>
+        </Card>
+        <View style={styles.listContainer}>
+          <Text style={styles.scrollTitle}>Guess History</Text>
+          <ScrollView contentContainerStyle={styles.list}>
+            {pastGuesses.map((guess, index) => renderListItem(guess, pastGuesses.length - (index)))}
+          </ScrollView>
+        </View>
+      </View>
+    );
+  };
+
 };
 
 
@@ -96,7 +134,6 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    margin: 20,
     width: 300,
     maxWidth: '80%'
   },
@@ -129,8 +166,16 @@ const styles = StyleSheet.create({
   },
 
   scrollTitle: {
-    fontFamily: 'open-sans-bold',
+    fontFamily: 'open-sans',
     textAlign: 'center',
-    marginTop: 10
+    marginTop: 10,
+    fontSize: 18
+  },
+
+  contentContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '80%',
+    alignItems: 'center'
   }
 });
