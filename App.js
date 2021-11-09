@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, SafeAreaView } from 'react-native';
 import AppLoading from 'expo-app-loading';
 import Header from './components/Header'
 import StartGameScreen from './screens/StartGameScreen'

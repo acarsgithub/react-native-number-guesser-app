@@ -4,6 +4,7 @@ import NumberContainer from '../components/NumberContainer';
 import Card from '../components/Card';
 import { Ionicons } from '@expo/vector-icons';
 import BodyText from '../components/BodyText';
+import colors from '../constants/colors';
 
 
 
@@ -104,8 +105,8 @@ const GameScreen = props => {
         <Text style={styles.text}>Computer's Guess</Text>
         <NumberContainer>{currentGuess}</NumberContainer>
         <Card style={{...styles.buttonContainer, margin: availableDeviceHeight > 600 ? 20 : 10}} >
-          <Button title="LOWER" color="red" onPress={nextGuessHandler.bind(this, 'lower')} ></Button>
-          <Button title="GREATER" onPress={nextGuessHandler.bind(this, 'greater')} ></Button>
+          <Button title="LOWER" color="red" onPress={nextGuessHandler.bind(this, 'lower')} color={colors.accent}></Button>
+          <Button title="GREATER" onPress={nextGuessHandler.bind(this, 'greater')} color={colors.primary} ></Button>
         </Card>
         <View style={styles.listContainer}>
           <Text style={styles.scrollTitle}>Guess History</Text>

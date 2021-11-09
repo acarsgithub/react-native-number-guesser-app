@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
         color: 'black',
         fontSize: 23,
         paddingBottom: 15,
-        fontFamily: 'open-sans-bold'
+        fontFamily: 'open-sans-bold',
+        color: 'white'
     }
 });
